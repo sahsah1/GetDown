@@ -8,8 +8,6 @@ import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String EXTRA_MESSAGE = "com.example.getdown.MESSAGE";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -17,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void begin(View view){
-        Intent intent = new Intent(this, ChooseLocation.class);
+        Intent intent = new Intent(this, FriendsList.class);
         startActivity(intent);
     }
 

@@ -10,7 +10,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.widget.TextView;
 
-public class ChooseLocation extends AppCompatActivity {
+public class MyLocation extends AppCompatActivity {
 
     LocationManager mLocationManager;
     private final LocationListener mLocationListener = new LocationListener() {
@@ -36,13 +36,13 @@ public class ChooseLocation extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_choose_location);
+        setContentView(R.layout.activity_my_location);
 
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10,
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
                 5, mLocationListener);
     }
 }
