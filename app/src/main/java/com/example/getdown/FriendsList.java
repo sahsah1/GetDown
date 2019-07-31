@@ -2,6 +2,7 @@ package com.example.getdown;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
@@ -40,7 +41,8 @@ public class FriendsList extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO
+                Intent intent = new Intent(FriendsList.this,AddFriendForm.class);
+                FriendsList.super.startActivity(intent);
             }
         });
 
