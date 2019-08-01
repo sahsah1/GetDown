@@ -22,17 +22,15 @@
             android:id="@+id/editText_addFriendName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autofillHints=""
-            android:inputType="textPersonName"
-            tools:text="@string/edit_friend_name" />
+            android:hint="@string/edit_friend_name"
+            android:inputType="textPersonName" />
 
         <EditText
             android:id="@+id/editText_chooseLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autofillHints=""
-            android:inputType="textPostalAddress"
-            tools:text="@string/edit_choose_location" />
+            android:hint="@string/edit_choose_location"
+            android:inputType="textPostalAddress" />
 
     </LinearLayout>
 

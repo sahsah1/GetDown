@@ -23,12 +23,12 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".MapActivity"></activity>
-        <activity android:name=".AddFriendForm" />
-        <activity android:name=".FriendsList" />
-        <activity
-            android:name=".MyLocation"
-            android:parentActivityName=".MainActivity" />
+        <activity android:name=".MapActivity"
+            android:parentActivityName=".AddFriendForm"></activity>
+        <activity android:name=".AddFriendForm"
+            android:parentActivityName=".FriendsList"/>
+        <activity android:name=".FriendsList"
+            android:parentActivityName=".MainActivity"/>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
