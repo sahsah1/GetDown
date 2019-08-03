@@ -8,4 +8,5 @@
     <string name="edit_choose_location">Choose Location...</string>
 
     <string name="google_maps_API_key">AIzaSyDmyg8CAqkztPUQogtvkOAf8HLECSytZtE</string>
+    <string name="search_hint">Enter Address, City or Zip Code</string>
 </resources>
