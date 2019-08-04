@@ -17,19 +17,18 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Places;
+import com.google.android.libraries.places.api.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -37,6 +36,12 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,16 +52,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final String TAG = "MapActivity";
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private static final float DEFAULT_ZOOM = 15f;
-    private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(
+    private static final RectangularBounds bounds = RectangularBounds.newInstance(
             new LatLng(-40, -168),
             new LatLng(71, 136));
+    private static final String apiKey = BuildConfig.API_KEY;
 
     //vars
     private Boolean mLocationPermissionsGranted = false;
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    private PlaceAutocompleteAdapter mPlaceAutocompleteAdapter;
-    private GoogleApiClient mGoogleApiClient;
 
     // Widgets
     private AutoCompleteTextView mSearchText;
@@ -100,15 +104,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
-        mGoogleApiClient = new GoogleApiClient
-                .Builder(this)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .enableAutoManage(this,this)
-                .build();
-        mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(this, mGoogleApiClient, LAT_LNG_BOUNDS, null);
+        // Initialize Places.
+        Places.initialize(getApplicationContext(), apiKey);
+        // Create a new Places client instance.
+        PlacesClient placesClient = Places.createClient(this);
 
-        mSearchText.setAdapter(mPlaceAutocompleteAdapter);
+        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
+        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+                // Call either setLocationBias() OR setLocationRestriction().
+                .setLocationBias(bounds)
+                //.setLocationRestriction(bounds)
+                //.setCountry("au")
+                .setTypeFilter(TypeFilter.ADDRESS)
+                .setSessionToken(token)
+                .setQuery(mSearchText.getText().toString())
+                .build();
+
+        placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
+            for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
+                Log.i(TAG, prediction.getPlaceId());
+                Log.i(TAG, prediction.getPrimaryText(null).toString());
+            }
+        }).addOnFailureListener((exception) -> {
+            if (exception instanceof ApiException) {
+                ApiException apiException = (ApiException) exception;
+                Log.e(TAG, "Place not found: " + apiException.getStatusCode());
+            }
+        });
 
         hideSoftKeyboard();
     }

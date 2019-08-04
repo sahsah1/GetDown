@@ -6,7 +6,5 @@
     <string name="edit_friend_name">Name</string>
     <string name="text_add_friend_title">Enter friend\'s details:</string>
     <string name="edit_choose_location">Choose Location...</string>
-
-    <string name="google_maps_API_key">AIzaSyDmyg8CAqkztPUQogtvkOAf8HLECSytZtE</string>
     <string name="search_hint">Enter Address, City or Zip Code</string>
 </resources>
