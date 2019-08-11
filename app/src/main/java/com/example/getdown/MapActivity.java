@@ -2,6 +2,7 @@ package com.example.getdown;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -16,14 +17,14 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.libraries.places.api.Places;
@@ -32,14 +33,19 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
@@ -58,14 +64,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
     // Widgets
-    private AutoCompleteTextView mSearchText;
+    private AutocompleteSupportFragment mAutocompleteSupportFragment;
+    private EditText mSearchText;
+
     private ImageView mGps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        mSearchText = (AutoCompleteTextView) findViewById(R.id.search_input);
+        mAutocompleteSupportFragment = (AutocompleteSupportFragment) (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.search_input);
+        mAutocompleteSupportFragment.setHint(getString(R.string.search_hint));
+        mSearchText = (EditText) mAutocompleteSupportFragment.getView().findViewById(R.id.places_autocomplete_search_input);
         mGps = (ImageView) findViewById(R.id.ic_gps);
 
         getLocationPermissions();
@@ -88,6 +99,26 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
 
                 return false;
+            }
+        });
+
+        Places.initialize(getApplicationContext(), apiKey);
+        PlacesClient placesClient = Places.createClient(this);
+        // Specify the types of place data to return.
+        mAutocompleteSupportFragment.setPlaceFields(Arrays.asList(Place.Field.LAT_LNG, Place.Field.ADDRESS));
+        mAutocompleteSupportFragment.setTypeFilter(TypeFilter.ADDRESS);
+
+        mAutocompleteSupportFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                mSearchText.setText(place.getAddress());
+                moveCamera(place.getLatLng(), DEFAULT_ZOOM, place.getAddress());
+                Log.i(TAG, "Place: " + place.getId() + ", " + place.getAddress());
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                Log.e(TAG, "onError: An error occurred " + status.getStatusMessage());
             }
         });
 
