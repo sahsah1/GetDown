@@ -10,7 +10,13 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "API_KEY", GetDown_GoogleMapsGooglePlacesAPI)
+        def addConstant = { constantName, constantValue ->
+            manifestPlaceholders += [(constantName): constantValue]
+            buildConfigField "String", "${constantName}", "${constantValue}"
+        }
+
+        addConstant("API_KEY", GetDown_GoogleMapsGooglePlacesAPI)
+        //buildConfigField("String", "API_KEY", GetDown_GoogleMapsGooglePlacesAPI)
     }
     buildTypes {
         release {

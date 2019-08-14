@@ -34,7 +34,7 @@ public class AddFriendForm extends AppCompatActivity {
         et.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(AddFriendForm.this, MapActivity.class);
+                Intent intent = new Intent(AddFriendForm.this, MapsActivity.class);
                 AddFriendForm.super.startActivity(intent);
             }
         });
