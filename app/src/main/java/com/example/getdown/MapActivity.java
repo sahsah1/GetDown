@@ -27,6 +27,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -66,8 +67,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     // Widgets
     private AutocompleteSupportFragment mAutocompleteSupportFragment;
     private EditText mSearchText;
-
     private ImageView mGps;
+    private Marker mMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +113,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 mSearchText.setText(place.getAddress());
-                moveCamera(place.getLatLng(), DEFAULT_ZOOM, place.getAddress());
+                moveCamera(place.getLatLng(), DEFAULT_ZOOM, place);
                 Log.d(TAG, "onPlaceSelected: Place info: " +place.getWebsiteUri());
                 Log.d(TAG, "onPlaceSelected: Place info: " +place.getPhoneNumber());
                 Log.d(TAG, "onPlaceSelected: Place info: " +place.getViewport());
@@ -155,7 +156,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Address address = results.get(0);
             Log.d(TAG, "geoLocate: Found a location: " + address.toString());
 
-            moveCamera(new LatLng(address.getLatitude(),address.getLongitude()), DEFAULT_ZOOM, address.getAddressLine(0));
+            moveCamera(new LatLng(address.getLatitude(),address.getLongitude()), DEFAULT_ZOOM, null);
         }
 
     }
@@ -240,7 +241,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                             Location currentLocation = (Location) task.getResult();
                             moveCamera(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),
-                                    DEFAULT_ZOOM, "My Location");
+                                    DEFAULT_ZOOM, null);
                         }
                         else{
                             Log.d(TAG, "onComplete: Current location is null.");
@@ -254,16 +255,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    private void moveCamera(LatLng latLng, float zoom, String title){
+    private void moveCamera(LatLng latLng, float zoom, Place place){
         Log.d(TAG, "moveCamera: Moving camera to: Lat: " + latLng.latitude + ", Lng: " + latLng.longitude);
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
-        if(title != "My Location"){
+        /*if(title != "My Location"){
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(latLng)
                     .title(title);
             mMap.addMarker(markerOptions);
+        }*/
+
+        mMap.clear();
+
+        if(place != null){
+            try{
+                String snippet = "Address: " + place.getAddress() + "\n" +
+                        "Phone Number: " + place.getPhoneNumber() + "\n" +
+                        "Website: " + place.getWebsiteUri() + "\n";
+
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title(place.getName())
+                        .snippet(snippet);
+
+                mMarker = mMap.addMarker(markerOptions);
+            }catch (NullPointerException e){
+                Log.e(TAG, "moveCamera: NullPointerException: " + e.getMessage());
+            }
         }
 
         hideSoftKeyboard();
