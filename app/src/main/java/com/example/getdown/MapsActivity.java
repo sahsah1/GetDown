@@ -3,9 +3,11 @@ package com.example.getdown;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -15,11 +17,13 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.getdown.databinding.ActivityMapsBinding;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -28,6 +32,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -55,11 +60,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Boolean mLocationPermissionsGranted = false;
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
+    private Place mPlace;
 
     // Widgets
     private AutocompleteSupportFragment mAutocompleteSupportFragment;
     private EditText mSearchText;
-    private ImageView mGps;
+    private ImageView mGps, mInfo;
+    private Marker mMarker;
+    private Button mButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +79,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mAutocompleteSupportFragment.setHint(getString(R.string.search_hint));
         mSearchText = (EditText) mAutocompleteSupportFragment.getView().findViewById(R.id.places_autocomplete_search_input);
         mGps = (ImageView) findViewById(R.id.ic_gps);
+        mInfo = (ImageView) findViewById(R.id.place_info);
+        mButton = (Button) findViewById(R.id.buttonConfirmLocation);
 
         getLocationPermissions();
 
@@ -140,8 +150,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mAutocompleteSupportFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
-                mSearchText.setText(place.getAddress());
-                moveCamera(place.getLatLng(), DEFAULT_ZOOM, place.getAddress());
+                //mSearchText.setText(place.getAddress());
+                moveCamera(place.getLatLng(), DEFAULT_ZOOM, place);
+                mPlace = place;
+                //address = place.getAddress();
+                //ActivityMapsBinding binding = DataBindingUtil.setContentView(MapsActivity.this, R.layout.activity_maps);
                 Log.d(TAG, "onPlaceSelected: Place info: " +place.getWebsiteUri());
                 Log.d(TAG, "onPlaceSelected: Place info: " +place.getPhoneNumber());
                 Log.d(TAG, "onPlaceSelected: Place info: " +place.getViewport());
@@ -160,6 +173,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View view) {
                 Log.d(TAG, "onClick: Clicked GPS icon.");
                 getDeviceLocation();
+            }
+        });
+
+        mInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick: Clicked place info");
+                try{
+                    if(mMarker.isInfoWindowShown()){
+                        mMarker.hideInfoWindow();
+                    }
+                    else{
+                        mMarker.showInfoWindow();
+                    }
+                }catch (NullPointerException e){
+                    Log.e(TAG, "onClick: NullPointerException: " + e.getMessage());
+                }
+            }
+        });
+
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MapsActivity.this, AddFriendForm.class);
+                intent.putExtra("CHOSEN_LOCATION", mPlace.getAddress());
+                Bundle extras = getIntent().getExtras();
+                if (extras != null) {
+                    String value = extras.getString("FRIEND_NAME");
+                    intent.putExtra("FRIEND_NAME", value);
+                }
+                startActivity(intent);
             }
         });
     }
@@ -182,7 +226,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Address address = results.get(0);
             Log.d(TAG, "geoLocate: Found a location: " + address.toString());
 
-            moveCamera(new LatLng(address.getLatitude(),address.getLongitude()), DEFAULT_ZOOM, address.getAddressLine(0));
+            moveCamera(new LatLng(address.getLatitude(),address.getLongitude()), DEFAULT_ZOOM, null);
         }
 
     }
@@ -203,7 +247,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             Location currentLocation = (Location) task.getResult();
                             moveCamera(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),
-                                    DEFAULT_ZOOM, "My Location");
+                                    DEFAULT_ZOOM, null);
                         }
                         else{
                             Log.d(TAG, "onComplete: Current location is null.");
@@ -217,16 +261,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void moveCamera(LatLng latLng, float zoom, String title){
+    private void moveCamera(LatLng latLng, float zoom, Place place){
         Log.d(TAG, "moveCamera: Moving camera to: Lat: " + latLng.latitude + ", Lng: " + latLng.longitude);
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
-        if(title != "My Location"){
+        mMap.clear();
+        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
+
+        /*if(place != null) {
+            try {
+                String snippet = "Address: " + place.getAddress() + "\n" +
+                        "Phone Number: " + place. + "\n" +
+                        "Website: " + place.getWebsiteUri() + "\n";
+
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title(place.getName())
+                        .snippet(snippet);
+
+                mMarker = mMap.addMarker(markerOptions);
+            } catch (NullPointerException e) {
+                Log.e(TAG, "moveCamera: NullPointerException: " + e.getMessage());
+            }
+        }*/
+
+        if(place != null){
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(latLng)
-                    .title(title);
-            mMap.addMarker(markerOptions);
+                    .title(place.getAddress());
+            mMarker = mMap.addMarker(markerOptions);
         }
     }
 

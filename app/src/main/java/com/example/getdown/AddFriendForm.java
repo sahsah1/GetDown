@@ -16,13 +16,22 @@ import com.google.android.gms.common.GoogleApiAvailability;
 public class AddFriendForm extends AppCompatActivity {
 
     private static final String TAG = "AddFriendForm";
-
     private static final int ERROR_DIALOG_REQUEST = 9001;
+
+    private EditText mFriendName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend_form);
+
+        mFriendName = (EditText) findViewById(R.id.editText_addFriendName);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            String value = extras.getString("FRIEND_NAME");
+            mFriendName.setText(value);
+        }
 
         if(isServicesOK()){
             init();
@@ -35,7 +44,8 @@ public class AddFriendForm extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(AddFriendForm.this, MapsActivity.class);
-                AddFriendForm.super.startActivity(intent);
+                intent.putExtra("FRIEND_NAME", mFriendName.getText());
+                startActivity(intent);
             }
         });
     }
