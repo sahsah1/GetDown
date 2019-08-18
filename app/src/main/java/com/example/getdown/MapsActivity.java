@@ -23,7 +23,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.getdown.databinding.ActivityMapsBinding;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -197,7 +196,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MapsActivity.this, AddFriendForm.class);
-                intent.putExtra("CHOSEN_LOCATION", mPlace.getAddress());
+                if(mPlace != null) {
+                    intent.putExtra("CHOSEN_LOCATION", mPlace.getAddress());
+                }
                 Bundle extras = getIntent().getExtras();
                 if (extras != null) {
                     String value = extras.getString("FRIEND_NAME");

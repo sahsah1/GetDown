@@ -19,6 +19,7 @@ public class AddFriendForm extends AppCompatActivity {
     private static final int ERROR_DIALOG_REQUEST = 9001;
 
     private EditText mFriendName;
+    private EditText mLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,11 +27,14 @@ public class AddFriendForm extends AppCompatActivity {
         setContentView(R.layout.activity_add_friend_form);
 
         mFriendName = (EditText) findViewById(R.id.editText_addFriendName);
+        mLocation = (EditText) findViewById(R.id.editText_chooseLocation);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            String value = extras.getString("FRIEND_NAME");
-            mFriendName.setText(value);
+            String name = extras.getString("FRIEND_NAME");
+            String place = extras.getString("CHOSEN_LOCATION");
+            mFriendName.setText(name);
+            mLocation.setText(place);
         }
 
         if(isServicesOK()){
@@ -44,7 +48,7 @@ public class AddFriendForm extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(AddFriendForm.this, MapsActivity.class);
-                intent.putExtra("FRIEND_NAME", mFriendName.getText());
+                intent.putExtra("FRIEND_NAME", mFriendName.getText().toString());
                 startActivity(intent);
             }
         });
