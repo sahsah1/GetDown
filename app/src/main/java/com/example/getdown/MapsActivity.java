@@ -3,7 +3,6 @@ package com.example.getdown;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
@@ -37,7 +36,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.model.TypeFilter;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
@@ -66,7 +64,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private EditText mSearchText;
     private ImageView mGps, mInfo;
     private Marker mMarker;
-    private Button mButton;
+    private Button mConfirmButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +77,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mSearchText = (EditText) mAutocompleteSupportFragment.getView().findViewById(R.id.places_autocomplete_search_input);
         mGps = (ImageView) findViewById(R.id.ic_gps);
         mInfo = (ImageView) findViewById(R.id.place_info);
-        mButton = (Button) findViewById(R.id.buttonConfirmLocation);
+        mConfirmButton = (Button) findViewById(R.id.buttonConfirmLocation);
 
         getLocationPermissions();
 
@@ -192,19 +190,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        mButton.setOnClickListener(new View.OnClickListener() {
+        mConfirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MapsActivity.this, AddFriendForm.class);
+                Intent intent = new Intent(MapsActivity.this, AddContactForm.class);
                 if(mPlace != null) {
                     intent.putExtra("CHOSEN_LOCATION", mPlace.getAddress());
+                    setResult(RESULT_OK, intent);
                 }
-                Bundle extras = getIntent().getExtras();
-                if (extras != null) {
-                    String value = extras.getString("FRIEND_NAME");
-                    intent.putExtra("FRIEND_NAME", value);
-                }
-                startActivity(intent);
+                finish();
             }
         });
     }

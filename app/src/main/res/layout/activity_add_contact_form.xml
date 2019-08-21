@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".AddContactForm">
+
+    <TextView
+        android:id="@+id/textView_addFriendTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/text_add_friend_title"
+        android:textSize="10pt"
+        android:layout_marginTop="16dp"/>
+
+    <EditText
+        android:id="@+id/editText_addFriendName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/edit_friend_name"
+        android:inputType="textPersonName"
+        android:layout_below="@id/textView_addFriendTitle"
+        android:layout_marginTop="16dp"/>
+
+    <EditText
+        android:id="@+id/editText_chooseLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/edit_choose_location"
+        android:inputType="textPostalAddress"
+        android:clickable="false"
+        android:cursorVisible="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:layout_marginTop="16dp"
+        android:layout_below="@id/editText_addFriendName"/>
+
+    <EditText
+        android:id="@+id/editText_phoneNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/phone_number"
+        android:layout_marginTop="16dp"
+        android:inputType="phone"
+        android:layout_below="@id/editText_chooseLocation"/>
+
+    <Button
+        android:id="@+id/button_save_contact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="16dp"
+        android:layout_centerHorizontal="true"
+        android:text="@string/button_save_contact" />
+
+</RelativeLayout>

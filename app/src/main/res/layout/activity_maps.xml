@@ -79,7 +79,6 @@
         android:layout_marginBottom="15dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
-
         android:text="@string/confirm_place_button" />
 
 </RelativeLayout>

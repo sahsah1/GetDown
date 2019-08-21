@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void begin(View view){
-        Intent intent = new Intent(this, FriendsList.class);
+        Intent intent = new Intent(this, ContactList.class);
         startActivity(intent);
     }
 

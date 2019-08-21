@@ -36,7 +36,7 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps"
-            android:parentActivityName=".AddFriendForm"></activity>
+            android:parentActivityName=".AddContactForm"></activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -44,12 +44,12 @@
 
         <!--<activity
             android:name=".MapActivity"
-            android:parentActivityName=".AddFriendForm" />-->
+            android:parentActivityName=".AddContactForm" />-->
         <activity
-            android:name=".AddFriendForm"
-            android:parentActivityName=".FriendsList" />
+            android:name=".AddContactForm"
+            android:parentActivityName=".ContactList" />
         <activity
-            android:name=".FriendsList"
+            android:name=".ContactList"
             android:parentActivityName=".MainActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
