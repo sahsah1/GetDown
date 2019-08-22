@@ -3,13 +3,17 @@ package com.example.getdown;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,22 +23,6 @@ public class ContactList extends AppCompatActivity {
     static final int ADD_CONTACT_REQUEST = 1;
     List<HashMap<String, String>> aList;
     SimpleAdapter simpleAdapter;
-
-//    String[] listviewTitle = new String[]{
-//            "ListView Title 1", "ListView Title 2", "ListView Title 3", "ListView Title 4",
-//            "ListView Title 5", "ListView Title 6", "ListView Title 7", "ListView Title 8",
-//    };
-//
-//    int[] listviewImage = new int[]{
-//            R.drawable.ic_profile_pic, R.drawable.ic_profile_pic, R.drawable.ic_profile_pic, R.drawable.ic_profile_pic,
-//            R.drawable.ic_profile_pic, R.drawable.ic_profile_pic, R.drawable.ic_profile_pic, R.drawable.ic_profile_pic,
-//    };
-//
-//    String[] listviewShortDescription = new String[]{
-//            "Android ListView Short Description", "Android ListView Short Description", "Android ListView Short Description", "Android ListView Short Description",
-//            "Android ListView Short Description", "Android ListView Short Description", "Android ListView Short Description", "Android ListView Short Description",
-//    };
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,18 +38,10 @@ public class ContactList extends AppCompatActivity {
             }
         });
 
-        aList = new ArrayList<HashMap<String, String>>();
+        loadContactList();
 
-//        for (int i = 0; i < 8; i++) {
-//            HashMap<String, String> hm = new HashMap<String, String>();
-//            hm.put("listview_title", listviewTitle[i]);
-//            hm.put("listview_description", listviewShortDescription[i]);
-//            hm.put("listview_image", Integer.toString(listviewImage[i]));
-//            aList.add(hm);
-//        }
-
-        String[] from = {"listview_image", "listview_title", "listview_description"};
-        int[] to = {R.id.listview_image, R.id.listview_item_title, R.id.listview_item_short_description};
+        String[] from = {"listview_image", "listview_title"};//, "listview_description"};
+        int[] to = {R.id.listview_image, R.id.listview_item_title};//, R.id.listview_item_short_description};
 
         simpleAdapter = new SimpleAdapter(getBaseContext(), aList, R.layout.listview_activity, from, to);
         ListView androidListView = findViewById(R.id.list_view);
@@ -77,12 +57,36 @@ public class ContactList extends AppCompatActivity {
                     ContactInfo contactInfo = (ContactInfo) extras.getSerializable("NEW_CONTACT");
                     HashMap<String, String> hm = new HashMap<String, String>();
                     hm.put("listview_title", contactInfo.getName());
-                    hm.put("listview_description", "This is a short description.");
+                    //hm.put("listview_description", "This is a short description.");
                     hm.put("listview_image", Integer.toString(R.drawable.ic_profile_pic));
                     aList.add(hm);
                     simpleAdapter.notifyDataSetChanged();
+                    saveContactList();
                 }
             }
+        }
+    }
+
+    private void saveContactList(){
+        SharedPreferences sharedPreferences = getSharedPreferences("SHARED_PREFERENCES", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+
+        String json = gson.toJson(aList);
+        editor.putString("CONTACT_LIST", json);
+        editor.apply();
+    }
+
+    private void loadContactList(){
+        SharedPreferences sharedPreferences = getSharedPreferences("SHARED_PREFERENCES", MODE_PRIVATE);
+        Gson gson = new Gson();
+
+        String json = sharedPreferences.getString("CONTACT_LIST", null);
+        Type type = new TypeToken<ArrayList<HashMap<String, String>>>() {}.getType();
+        aList = gson.fromJson(json, type);
+
+        if(aList == null){
+            aList = new ArrayList<>();
         }
     }
 }

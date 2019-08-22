@@ -11,4 +11,5 @@
     <string name="confirm_place_button">Confirm</string>
     <string name="phone_number">Phone Number</string>
     <string name="button_save_contact">Save Contact</string>
+    <string name="user_image">User\'s Image</string>
 </resources>
