@@ -53,6 +53,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final float DEFAULT_ZOOM = 15f;
     private static final String apiKey = BuildConfig.API_KEY;
 
+    public static Location myLocation = null;
+
     //vars
     private Boolean mLocationPermissionsGranted = false;
     private GoogleMap mMap;
@@ -243,6 +245,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Location currentLocation = (Location) task.getResult();
                             moveCamera(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),
                                     DEFAULT_ZOOM, null);
+
+                            myLocation = currentLocation;
                         }
                         else{
                             Log.d(TAG, "onComplete: Current location is null.");
