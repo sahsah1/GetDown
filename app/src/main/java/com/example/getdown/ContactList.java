@@ -30,6 +30,7 @@ public class ContactList extends AppCompatActivity {
     private static final String TAG = "ContactList";
     private static final String apiKey = BuildConfig.API_KEY;
     List<HashMap<String, String>> aList;
+    HashMap<String, ContactInfo> contactInfos;
     SimpleAdapter simpleAdapter;
     private GeoApiContext mGeoApiContext = null;
 
@@ -39,7 +40,7 @@ public class ContactList extends AppCompatActivity {
         setContentView(R.layout.activity_contact_list);
 
         if(mGeoApiContext == null){
-            mGeoApiContext = new GeoApiContext.Builder().apiKey(apiKey).build();
+//            mGeoApiContext = new GeoApiContext.Builder().apiKey(apiKey).build();
         }
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -67,10 +68,9 @@ public class ContactList extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 Bundle extras = data.getExtras();
                 if (extras != null) {
-                    ContactInfo contactInfo = (ContactInfo) extras.getSerializable("NEW_CONTACT");
+                    ContactInfo contactInfo = (ContactInfo) extras.getParcelable("NEW_CONTACT");
                     HashMap<String, String> hm = new HashMap<String, String>();
                     hm.put("listview_title", contactInfo.getName());
-                    //hm.put("listview_description", "This is a short description.");
                     hm.put("listview_image", Integer.toString(R.drawable.ic_profile_pic));
                     aList.add(hm);
                     simpleAdapter.notifyDataSetChanged();
@@ -87,6 +87,9 @@ public class ContactList extends AppCompatActivity {
 
         String json = gson.toJson(aList);
         editor.putString("CONTACT_LIST", json);
+
+        json = gson.toJson(contactInfos);
+        editor.putString("CONTACT_INFOS", json);
         editor.apply();
     }
 
@@ -98,8 +101,16 @@ public class ContactList extends AppCompatActivity {
         Type type = new TypeToken<ArrayList<HashMap<String, String>>>() {}.getType();
         aList = gson.fromJson(json, type);
 
+        json = sharedPreferences.getString("CONTACT_INFOS", null);
+        type = new TypeToken<HashMap<String, ContactInfo>>() {}.getType();
+        contactInfos = gson.fromJson(json, type);
+
         if(aList == null){
             aList = new ArrayList<>();
+        }
+
+        if(contactInfos == null){
+            contactInfos = new HashMap<>();
         }
     }
 
