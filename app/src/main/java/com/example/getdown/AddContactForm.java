@@ -68,10 +68,11 @@ public class AddContactForm extends AppCompatActivity {
                     return;
                 }
                 Intent intent = new Intent(AddContactForm.this, ContactList.class);
-                ContactInfo contactInfo = new ContactInfo(mContactName.getText().toString(),
+                final ContactInfo contactInfo = new ContactInfo(mContactName.getText().toString(),
                         mPlace,mPhone.getText().toString());
                 Bundle bundle = new Bundle();
-                bundle.putParcelable("NEW_CONTACT", contactInfo);
+                Serializer.serialize(contactInfo, "contactInfo.dat");
+                //bundle.putSerializable("NEW_CONTACT", contactInfo);
                 intent.putExtras(bundle);
                 setResult(RESULT_OK, intent);
                 finish();

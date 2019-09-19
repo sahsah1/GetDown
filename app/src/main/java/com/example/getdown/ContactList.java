@@ -67,15 +67,16 @@ public class ContactList extends AppCompatActivity {
         if (requestCode == ADD_CONTACT_REQUEST) {
             if (resultCode == RESULT_OK) {
                 Bundle extras = data.getExtras();
-                if (extras != null) {
-                    ContactInfo contactInfo = (ContactInfo) extras.getParcelable("NEW_CONTACT");
+                //if (extras != null) {
+                    //ContactInfo contactInfo = (ContactInfo) extras.getSerializable("NEW_CONTACT");
+                    final ContactInfo contactInfo = Serializer.deserialize("contactInfo.dat", ContactInfo.class);
                     HashMap<String, String> hm = new HashMap<String, String>();
                     hm.put("listview_title", contactInfo.getName());
                     hm.put("listview_image", Integer.toString(R.drawable.ic_profile_pic));
                     aList.add(hm);
                     simpleAdapter.notifyDataSetChanged();
                     saveContactList();
-                }
+                //}
             }
         }
     }

@@ -11,7 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-public class ContactInfo implements Parcelable {
+public class ContactInfo implements Serializable {
 
     private String name;
     private Place place;
@@ -23,29 +23,12 @@ public class ContactInfo implements Parcelable {
         this.phoneNumber = phoneNumber;
     }
 
-    protected ContactInfo(Parcel in) {
-        name = in.readString();
-        //place = in.readParcelable(Place.class.getClassLoader());
-        phoneNumber = in.readString();
-    }
-
-    public static final Creator<ContactInfo> CREATOR = new Creator<ContactInfo>() {
-        @Override
-        public ContactInfo createFromParcel(Parcel in) {
-            return new ContactInfo(in);
-        }
-
-        @Override
-        public ContactInfo[] newArray(int size) {
-            return new ContactInfo[size];
-        }
-    };
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setAddress(Place place) {
+    public void setPlace(Place place) {
         this.place = place;
     }
 
@@ -64,18 +47,5 @@ public class ContactInfo implements Parcelable {
     public String getPhoneNumber() {
         return phoneNumber;
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(this.name);
-        parcel.writeString(this.phoneNumber);
-        place.writeToParcel(parcel, i);
-    }
-
 
 }
