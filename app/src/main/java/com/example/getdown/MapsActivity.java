@@ -198,7 +198,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Intent intent = new Intent(MapsActivity.this, AddContactForm.class);
                 if(mPlace != null) {
                     Bundle bundle = new Bundle();
-                    bundle.putParcelable("CHOSEN_LOCATION", mPlace);
+                    bundle.putParcelable("CHOSEN_LOCATION", mPlace.getLatLng());
+                    bundle.putString("CHOSEN_ADDRESS", mPlace.getAddress());
                     intent.putExtras(bundle);
                     setResult(RESULT_OK, intent);
                 }

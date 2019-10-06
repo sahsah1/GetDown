@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -33,6 +35,11 @@ public class ContactList extends AppCompatActivity {
     HashMap<String, ContactInfo> contactInfos;
     SimpleAdapter simpleAdapter;
     private GeoApiContext mGeoApiContext = null;
+    int currentPosition = 0;
+
+    // Widgets
+    FloatingActionButton fab;
+    ImageView removeListItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +50,21 @@ public class ContactList extends AppCompatActivity {
 //            mGeoApiContext = new GeoApiContext.Builder().apiKey(apiKey).build();
         }
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ContactList.this, AddContactForm.class);
                 startActivityForResult(intent, ADD_CONTACT_REQUEST);
+            }
+        });
+
+        ListView androidListView = findViewById(R.id.list_view);
+
+        androidListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                currentPosition = i;
             }
         });
 
@@ -58,7 +74,6 @@ public class ContactList extends AppCompatActivity {
         int[] to = {R.id.listview_image, R.id.listview_item_title};//, R.id.listview_item_short_description};
 
         simpleAdapter = new SimpleAdapter(getBaseContext(), aList, R.layout.listview_activity, from, to);
-        ListView androidListView = findViewById(R.id.list_view);
         androidListView.setAdapter(simpleAdapter);
     }
 
@@ -67,16 +82,16 @@ public class ContactList extends AppCompatActivity {
         if (requestCode == ADD_CONTACT_REQUEST) {
             if (resultCode == RESULT_OK) {
                 Bundle extras = data.getExtras();
-                //if (extras != null) {
-                    //ContactInfo contactInfo = (ContactInfo) extras.getSerializable("NEW_CONTACT");
-                    final ContactInfo contactInfo = Serializer.deserialize("contactInfo.dat", ContactInfo.class);
+                if (extras != null) {
+                    ContactInfo contactInfo = (ContactInfo) extras.getParcelable("NEW_CONTACT");
+                    //final ContactInfo contactInfo = Serializer.deserialize("contactInfo.dat", ContactInfo.class);
                     HashMap<String, String> hm = new HashMap<String, String>();
                     hm.put("listview_title", contactInfo.getName());
                     hm.put("listview_image", Integer.toString(R.drawable.ic_profile_pic));
                     aList.add(hm);
                     simpleAdapter.notifyDataSetChanged();
                     saveContactList();
-                //}
+                }
             }
         }
     }
@@ -147,5 +162,14 @@ public class ContactList extends AppCompatActivity {
 
             }
         });
+    }
+
+    public void removeListItem (View view){
+        if(currentPosition != 0) {
+            int positionToRemove = currentPosition;
+            aList.remove(positionToRemove);
+            simpleAdapter.notifyDataSetChanged();
+            saveContactList();
+        }
     }
 }

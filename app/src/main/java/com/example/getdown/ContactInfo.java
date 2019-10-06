@@ -11,24 +11,42 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-public class ContactInfo implements Serializable {
+public class ContactInfo implements Parcelable {
 
     private String name;
-    private Place place;
+    private LatLng place;
     private String phoneNumber;
 
-    public ContactInfo(String name, Place address, String phoneNumber) {
+    public ContactInfo(String name, LatLng address, String phoneNumber) {
         this.name = name;
         this.place = address;
         this.phoneNumber = phoneNumber;
     }
 
 
+    protected ContactInfo(Parcel in) {
+        name = in.readString();
+        place = LatLng.CREATOR.createFromParcel(in);
+        phoneNumber = in.readString();
+    }
+
+    public static final Creator<ContactInfo> CREATOR = new Creator<ContactInfo>() {
+        @Override
+        public ContactInfo createFromParcel(Parcel in) {
+            return new ContactInfo(in);
+        }
+
+        @Override
+        public ContactInfo[] newArray(int size) {
+            return new ContactInfo[size];
+        }
+    };
+
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setPlace(Place place) {
+    public void setPlace(LatLng place) {
         this.place = place;
     }
 
@@ -40,7 +58,7 @@ public class ContactInfo implements Serializable {
         return name;
     }
 
-    public Place getPlace() {
+    public LatLng getPlace() {
         return place;
     }
 
@@ -48,4 +66,15 @@ public class ContactInfo implements Serializable {
         return phoneNumber;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(name);
+        place.writeToParcel(parcel, i);
+        parcel.writeString(phoneNumber);
+    }
 }

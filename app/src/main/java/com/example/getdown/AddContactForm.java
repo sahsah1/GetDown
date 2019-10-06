@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
 
 public class AddContactForm extends AppCompatActivity {
@@ -26,7 +27,7 @@ public class AddContactForm extends AppCompatActivity {
     private EditText mPhone;
     private Button mSaveContact;
 
-    private Place mPlace;
+    private LatLng mPlace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +72,8 @@ public class AddContactForm extends AppCompatActivity {
                 final ContactInfo contactInfo = new ContactInfo(mContactName.getText().toString(),
                         mPlace,mPhone.getText().toString());
                 Bundle bundle = new Bundle();
-                Serializer.serialize(contactInfo, "contactInfo.dat");
-                //bundle.putSerializable("NEW_CONTACT", contactInfo);
+                //Serializer.serialize(contactInfo, "contactInfo.dat");
+                bundle.putParcelable("NEW_CONTACT", contactInfo);
                 intent.putExtras(bundle);
                 setResult(RESULT_OK, intent);
                 finish();
@@ -86,8 +87,8 @@ public class AddContactForm extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 Bundle extras = data.getExtras();
                 if (extras != null) {
-                    mPlace = (Place) extras.getParcelable("CHOSEN_LOCATION");
-                    mAddress.setText(mPlace.getAddress());
+                    mPlace = (LatLng) extras.getParcelable("CHOSEN_LOCATION");
+                    mAddress.setText(extras.getString("CHOSEN_ADDRESS"));
                 }
             }
         }
